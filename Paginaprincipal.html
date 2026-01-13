@@ -3,531 +3,368 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analytics Finance - Grupo 03</title>
+    <title>Control de Gastos - Grupo 03</title>
     
-    <!-- Scripts externos -->
+    <!-- Scripts Externos -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-        :root {
-            --brand-blue: #0052cc;
-            --light-blue: #f0f7ff;
-            --dark-navy: #091e42;
-            --accent-cyan: #00b8d9;
-        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f1f5f9; }
+        .tab-active { @apply bg-slate-900 text-white shadow-xl scale-105; }
+        .chart-container { position: relative; height: 300px; width: 100%; }
+        .diagram-card { @apply cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 border-2 border-transparent hover:border-indigo-500; }
+        .audit-log-row:nth-child(even) { background-color: #f8fafc; }
+        
+        /* Modal Styles */
+        #modal-viewer { display: none; }
+        #modal-viewer.active { display: flex; }
 
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #f4f7fa;
-            color: var(--dark-navy);
-        }
-
-        /* Diseño Orgánico: Formas de Guijarro */
-        .pebble-card {
-            background: white;
-            border-radius: 35px;
-            border: 1px solid rgba(0, 82, 204, 0.08);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.03);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-        }
-
-        .pebble-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 35px -10px rgba(0, 82, 204, 0.1);
-        }
-
-        .btn-organic {
-            border-radius: 20px;
-            padding: 8px 24px;
-            font-weight: 700;
-            font-size: 0.75rem;
-            transition: all 0.3s ease;
-        }
-
-        .tab-active {
-            background-color: var(--brand-blue);
-            color: white;
-            box-shadow: 0 8px 15px -4px rgba(0, 82, 204, 0.4);
-        }
-
-        .chart-container {
-            position: relative;
-            height: 280px;
-            width: 100%;
-        }
-
-        /* Hoja de Auditoría */
-        .audit-paper {
-            border-radius: 40px;
-            background: linear-gradient(135deg, #ffffff 0%, #f9fbff 100%);
-            border: 2px solid #eef2f8;
-        }
-
-        .report-pill {
-            background: var(--light-blue);
-            border-left: 4px solid var(--brand-blue);
-            padding: 1rem;
-            border-radius: 12px 24px 24px 12px;
-        }
-
-        /* Animaciones */
-        .animate-float {
-            animation: float 6s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
-
-        input[type="number"] {
-            border-radius: 18px;
-            background: #f8fafc;
-            border: 2px solid #e2e8f0;
-            padding: 12px 20px;
-            font-weight: 800;
-            color: var(--brand-blue);
-            outline: none;
-            width: 100%;
-        }
-
-        input[type="number"]:focus {
-            border-color: var(--brand-blue);
-            background: white;
-        }
-
-        /* Sistema de Avatares */
-        .avatar-container {
-            position: relative;
-            width: 110px;
-            height: 110px;
-            margin-bottom: 1.5rem;
-        }
-
-        .team-avatar {
-            width: 110px;
-            height: 110px;
-            border-radius: 38px;
-            object-fit: cover;
-            background: var(--light-blue);
-            border: 4px solid white;
-            box-shadow: 0 8px 15px rgba(0,0,0,0.05);
-            transition: all 0.5s ease;
-        }
-
-        .avatar-change-btn {
-            position: absolute;
-            bottom: -5px;
-            right: -5px;
-            background: var(--brand-blue);
-            color: white;
-            width: 32px;
-            height: 32px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            border: 3px solid white;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-            z-index: 10;
-        }
-
-        .avatar-change-btn:hover {
-            transform: rotate(15deg) scale(1.1);
-            background: var(--accent-cyan);
-        }
-
-        .avatar-loading {
-            opacity: 0.5;
-            filter: grayscale(1);
-            transform: scale(0.9);
-        }
-
-        /* Contenedor Open Source / Colab */
-        .colab-section {
-            background: linear-gradient(135deg, #091e42 0%, #0052cc 100%);
-            border-radius: 40px;
-            position: relative;
-            overflow: hidden;
-            color: white;
-        }
-
-        .colab-section::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -10%;
-            width: 300px;
-            height: 300px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 50%;
-            filter: blur(40px);
-        }
-
-        .colab-button {
-            background: #f9ab00; 
-            color: white;
-            border-radius: 20px;
-            padding: 12px 28px;
-            font-weight: 800;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 20px rgba(249, 171, 0, 0.3);
-        }
-
-        .colab-button:hover {
-            transform: scale(1.05);
-            background: #ffb700;
-            box-shadow: 0 15px 30px rgba(249, 171, 0, 0.4);
-        }
+        /* Custom Avatars */
+        .avatar-container:hover .avatar-bg { @apply scale-110 rotate-3 bg-indigo-500; }
+        .avatar-bg { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     </style>
 </head>
-<body class="antialiased pb-20">
+<body class="antialiased text-slate-900">
 
-    <!-- Navegación -->
-    <header class="max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row justify-between items-center gap-6">
-        <div class="flex items-center gap-4">
-            <div class="w-14 h-14 bg-blue-600 rounded-[22px] flex items-center justify-center text-white shadow-xl shadow-blue-200 animate-float">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
+    <!-- Navegación Superior -->
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-600 p-2 rounded-xl text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" /></svg>
+                </div>
+                <div>
+                    <h1 class="text-xl font-extrabold tracking-tight uppercase">Finance Control G3</h1>
+                    <p class="text-[10px] font-bold text-indigo-600 uppercase tracking-widest">UTMACH - Ingeniería Civil</p>
+                </div>
             </div>
-            <div>
-                <h1 class="text-2xl font-extrabold tracking-tight text-slate-900">Financial Insights</h1>
-                <p class="text-[10px] font-bold text-blue-500 uppercase tracking-[0.3em]">Data Science - Grupo 03</p>
-            </div>
+            
+            <nav class="flex flex-wrap gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
+                <button onclick="showView('dashboard')" id="nav-dashboard" class="px-5 py-2 text-xs font-bold rounded-xl transition-all tab-active">DASHBOARD</button>
+                <button onclick="showView('diagrams')" id="nav-diagrams" class="px-5 py-2 text-xs font-bold rounded-xl transition-all text-slate-500 hover:text-indigo-600">DIAGRAMAS</button>
+                <button onclick="showView('audit')" id="nav-audit" class="px-5 py-2 text-xs font-bold rounded-xl transition-all text-slate-500 hover:text-indigo-600">AUDITORÍA</button>
+            </nav>
         </div>
-
-        <nav class="flex gap-2 bg-white/80 backdrop-blur-md p-1.5 rounded-[25px] border border-slate-200 shadow-sm">
-            <button onclick="showSection('dashboard')" id="nav-dash" class="btn-organic tab-active uppercase tracking-wider">Dashboard</button>
-            <button onclick="showSection('diagrams')" id="nav-diag" class="btn-organic text-slate-400 hover:text-blue-600 uppercase tracking-wider">Diagramas</button>
-        </nav>
     </header>
 
-    <main class="max-w-7xl mx-auto px-6 mt-6">
-
-        <!-- DASHBOARD PRINCIPAL -->
-        <div id="section-dashboard" class="space-y-8">
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Presupuesto -->
-                <div class="pebble-card p-8 bg-slate-900 text-white border-none shadow-2xl">
-                    <span class="text-[10px] font-black text-blue-400 uppercase tracking-widest">Entrada de Datos</span>
-                    <h3 class="text-lg font-bold mt-2 mb-4">Presupuesto (B)</h3>
-                    <div class="relative">
-                        <span class="absolute left-4 top-3 text-slate-400 font-bold">$</span>
-                        <input type="number" id="budgetInput" value="60" oninput="runAnalysis()" class="pl-10 text-xl border-none ring-2 ring-slate-800 focus:ring-blue-500 bg-slate-800 text-white">
-                    </div>
-                </div>
-
-                <!-- Acumulado -->
-                <div class="pebble-card p-8 bg-blue-600 text-white border-none">
-                    <span class="text-[10px] font-bold text-blue-100 uppercase tracking-widest">Gasto Acumulado</span>
-                    <div id="weeklyTotal" class="text-5xl font-black mt-3">$0.00</div>
-                    <div class="mt-6 flex items-center justify-between">
-                        <span class="text-[10px] font-medium opacity-80">PROGRESO SEMANAL</span>
-                        <span id="progressPercent" class="text-xs font-black">0%</span>
-                    </div>
-                    <div class="mt-2 w-full bg-blue-800/40 h-2.5 rounded-full overflow-hidden">
-                        <div id="progressBar" class="bg-white h-full transition-all duration-1000" style="width: 0%"></div>
-                    </div>
-                </div>
-
-                <!-- Estado -->
-                <div id="statusCard" class="pebble-card p-8 flex flex-col justify-center items-center text-center">
-                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Estado Financiero</span>
-                    <div id="statusLabel" class="text-2xl font-black text-slate-800">CARGANDO</div>
-                    <p id="statusSub" class="text-[10px] font-bold text-slate-400 uppercase mt-2">Analizando algoritmos...</p>
-                    <div class="mt-4 p-2 rounded-full bg-slate-50 w-full flex justify-center">
-                        <div id="statusIndicator" class="w-3 h-3 rounded-full bg-slate-300"></div>
-                    </div>
-                </div>
-
-                <!-- Dominante -->
-                <div class="pebble-card p-8 bg-white border-t-8 border-blue-600">
-                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Categoría Dominante</span>
-                    <div id="dominantCat" class="text-2xl font-black text-blue-700 mt-2">---</div>
-                    <div id="dominantVal" class="text-sm font-bold text-slate-500 mt-1">$0.00 USD</div>
-                    <div class="mt-6 text-[9px] bg-blue-50 text-blue-600 px-3 py-1 rounded-full font-black inline-block uppercase">Punto de atención</div>
-                </div>
+    <!-- VISTA 1: DASHBOARD -->
+    <main id="view-dashboard" class="max-w-7xl mx-auto p-6 space-y-8 animate-in fade-in duration-500">
+        <!-- Indicadores Superiores -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+                <label class="text-xs font-black text-slate-400 uppercase mb-2 block">Presupuesto (B)</label>
+                <input type="number" id="budgetInput" value="60" oninput="updateCalculations()" class="w-full bg-slate-50 border-none rounded-2xl p-3 text-2xl font-black focus:ring-2 focus:ring-indigo-500">
             </div>
-
-            <!-- Gráficas -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div class="pebble-card p-10">
-                    <h4 class="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-8">Tendencia Diaria vs Límite</h4>
-                    <div class="chart-container">
-                        <canvas id="lineChart"></canvas>
-                    </div>
-                </div>
-                <div class="pebble-card p-10">
-                    <h4 class="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-8">Balance por Categoría</h4>
-                    <div class="chart-container">
-                        <canvas id="barChart"></canvas>
-                    </div>
-                </div>
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+                <label class="text-xs font-black text-slate-400 uppercase block">Gasto Semanal</label>
+                <div id="weeklyTotal" class="text-3xl font-black text-slate-900 mt-1">$0.00</div>
             </div>
-
-            <!-- AUDITORÍA -->
-            <div class="audit-paper p-10 shadow-xl">
-                <div class="flex items-center gap-4 mb-10 pb-6 border-b border-slate-100">
-                    <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                    </div>
-                    <div>
-                        <h2 class="text-xl font-black text-slate-800">Hoja de Auditoría Automática</h2>
-                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Resultados del procesamiento de datos (Python Core)</p>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-                    <div class="space-y-6">
-                        <h3 class="text-[11px] font-black text-blue-600 uppercase tracking-widest">1. Resumen de Flujo</h3>
-                        <div id="report-summary" class="space-y-4"></div>
-                    </div>
-                    <div class="space-y-6">
-                        <h3 class="text-[11px] font-black text-blue-600 uppercase tracking-widest">2. Alertas de Umbral</h3>
-                        <div id="report-alerts" class="space-y-2 max-h-[200px] overflow-y-auto pr-2"></div>
-                    </div>
-                    <div class="space-y-6">
-                        <h3 class="text-[11px] font-black text-blue-600 uppercase tracking-widest">3. Recomendación Técnica</h3>
-                        <div class="report-pill bg-blue-50/50">
-                            <p id="report-conclusions" class="text-sm text-slate-600 leading-relaxed italic"></p>
-                        </div>
-                    </div>
-                </div>
+            <div id="statusBox" class="p-6 rounded-3xl shadow-sm border transition-all duration-500">
+                <label class="text-xs font-black uppercase opacity-60 block">Estatus</label>
+                <div id="statusText" class="text-2xl font-black mt-1 tracking-tighter">Calculando...</div>
             </div>
-
-            <!-- SECCIÓN OPEN SOURCE / COLAB -->
-            <div class="colab-section p-10 md:p-14 shadow-2xl mt-12">
-                <div class="flex flex-col md:flex-row justify-between items-center gap-10 relative z-10">
-                    <div class="max-w-2xl text-center md:text-left">
-                        <div class="inline-block px-4 py-1 rounded-full bg-blue-500/20 border border-blue-400/30 text-[10px] font-black uppercase tracking-widest mb-4">
-                            Recursos de Desarrollo
-                        </div>
-                        <h2 class="text-3xl md:text-4xl font-black mb-4">Proyecto Open Source</h2>
-                        <p class="text-blue-100 text-sm md:text-base leading-relaxed font-medium">
-                            Accede a la lógica completa del núcleo del sistema. Todo el procesamiento de datos, validaciones y modelos matemáticos están disponibles en nuestro notebook de Google Colab para su auditoría y mejora continua.
-                        </p>
-                    </div>
-                    <div>
-                        <a href="TU_LINK_DE_GOOGLE_COLAB_AQUI" target="_blank" class="colab-button">
-                            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M13.4,12l6.5,2.7c0.4,0.2,0.6,0.5,0.6,0.9c0,0.6-0.6,1.1-1.2,1.1c-0.2,0-0.4-0.1-0.6-0.2L12,14.1l-6.7,2.4 c-0.2,0.1-0.4,0.2-0.6,0.2c-0.6,0-1.2-0.5-1.2-1.1c0-0.4,0.2-0.7,0.6-0.9l6.5-2.7l-6.5-2.7c-0.4-0.2-0.6-0.5-0.6-0.9 c0-0.6,0.6-1.1,1.2-1.1c0.2,0,0.4,0.1,0.6,0.2L12,9.9l6.7-2.4c0.2-0.1,0.4-0.2,0.6-0.2c0.6,0,1.2,0.5,1.2,1.1c0,0.4-0.2,0.7-0.6,0.9 L13.4,12z"/>
-                            </svg>
-                            VER CÓDIGO EN COLAB
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- INTEGRANTES -->
-            <div class="mt-16 space-y-10">
-                <div class="text-center">
-                    <h2 class="text-2xl font-black text-slate-900">Equipo de Investigación</h2>
-                    <p class="text-[10px] font-bold text-blue-500 uppercase tracking-[0.4em] mt-2">Personaliza los Avatares</p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <div class="pebble-card p-6 flex flex-col items-center text-center">
-                        <div class="avatar-container">
-                            <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-400 rounded-[38px] blur opacity-20"></div>
-                            <img id="avatar-1" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Luis" alt="Luis" class="team-avatar relative">
-                            <div onclick="changeAvatar(1)" class="avatar-change-btn">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                </svg>
-                            </div>
-                        </div>
-                        <h4 class="font-black text-slate-800 text-sm">Luis Alberto</h4>
-                        <span class="text-[9px] font-bold text-blue-600 uppercase mt-1">Líder de Proyecto</span>
-                    </div>
-                    <div class="pebble-card p-6 flex flex-col items-center text-center">
-                        <div class="avatar-container">
-                            <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-400 rounded-[38px] blur opacity-20"></div>
-                            <img id="avatar-2" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Maria" alt="María" class="team-avatar relative">
-                            <div onclick="changeAvatar(2)" class="avatar-change-btn">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                </svg>
-                            </div>
-                        </div>
-                        <h4 class="font-black text-slate-800 text-sm">María Fernanda</h4>
-                        <span class="text-[9px] font-bold text-blue-600 uppercase mt-1">Analista de Datos</span>
-                    </div>
-                    <div class="pebble-card p-6 flex flex-col items-center text-center">
-                        <div class="avatar-container">
-                            <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-400 rounded-[38px] blur opacity-20"></div>
-                            <img id="avatar-3" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Carlos" alt="Carlos" class="team-avatar relative">
-                            <div onclick="changeAvatar(3)" class="avatar-change-btn">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                </svg>
-                            </div>
-                        </div>
-                        <h4 class="font-black text-slate-800 text-sm">Carlos Javier</h4>
-                        <span class="text-[9px] font-bold text-blue-600 uppercase mt-1">Desarrollador Python</span>
-                    </div>
-                    <div class="pebble-card p-6 flex flex-col items-center text-center">
-                        <div class="avatar-container">
-                            <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-400 rounded-[38px] blur opacity-20"></div>
-                            <img id="avatar-4" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Elena" alt="Elena" class="team-avatar relative">
-                            <div onclick="changeAvatar(4)" class="avatar-change-btn">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                </svg>
-                            </div>
-                        </div>
-                        <h4 class="font-black text-slate-800 text-sm">Elena Sofía</h4>
-                        <span class="text-[9px] font-bold text-blue-600 uppercase mt-1">Diseñadora de UI</span>
-                    </div>
-                </div>
+            <div class="bg-slate-900 p-6 rounded-3xl shadow-xl text-white">
+                <label class="text-xs font-black text-indigo-400 uppercase block">Mayor Gasto</label>
+                <div id="domCat" class="text-xl font-bold mt-1 tracking-tight italic">---</div>
             </div>
         </div>
 
-        <!-- DIAGRAMAS -->
-        <div id="section-diagrams" class="hidden space-y-8">
-            <div class="pebble-card p-10 flex flex-col items-center">
-                <div class="flex flex-wrap justify-center gap-3 mb-10 bg-slate-100 p-2 rounded-[30px]">
-                    <button onclick="changeDiag('general')" class="diag-btn btn-organic tab-active">GENERAL</button>
-                    <button onclick="changeDiag('suma')" class="diag-btn btn-organic text-slate-500">SUMA_LISTA</button>
-                    <button onclick="changeDiag('cat')" class="diag-btn btn-organic text-slate-500">CATEGORÍAS</button>
-                    <button onclick="changeDiag('clasifica')" class="diag-btn btn-organic text-slate-500">CLASIFICACIÓN</button>
-                </div>
-                <div class="w-full max-w-4xl">
-                    <img id="mainDiagImg" src="https://via.placeholder.com/1000x600/f8fafc/0052cc?text=DIAGRAMA+GENERAL+PSeInt" class="w-full h-auto rounded-[40px] shadow-2xl border-[12px] border-white">
-                </div>
+        <!-- Gráficos -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-200 h-[400px]">
+                <h3 class="font-black text-slate-800 uppercase text-xs mb-6">Tendencia Diaria</h3>
+                <div class="chart-container"><canvas id="lineChart"></canvas></div>
+            </div>
+            <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-200 h-[400px]">
+                <h3 class="font-black text-slate-800 uppercase text-xs mb-6">Distribución por Categoría</h3>
+                <div class="chart-container"><canvas id="barChart"></canvas></div>
             </div>
         </div>
 
+        <!-- SECCIÓN: INTEGRANTES DEL GRUPO -->
+        <section class="mt-12">
+            <div class="flex items-center gap-4 mb-8">
+                <div class="h-px flex-1 bg-slate-200"></div>
+                <h3 class="font-black text-slate-400 uppercase text-[10px] tracking-[0.3em]">Equipo de Desarrollo - Grupo 03</h3>
+                <div class="h-px flex-1 bg-slate-200"></div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <!-- Integrante 1 -->
+                <div class="avatar-container bg-white p-6 rounded-[2.5rem] border border-slate-200 text-center transition-all">
+                    <div class="avatar-bg w-20 h-20 bg-slate-100 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl shadow-inner border-4 border-white">
+                        👨‍💻
+                    </div>
+                    <h4 class="font-extrabold text-slate-800 text-sm uppercase leading-tight">Integrante 1</h4>
+                    <p class="text-[9px] font-bold text-indigo-500 uppercase mt-1 tracking-widest">Coordinador</p>
+                </div>
+                <!-- Integrante 2 -->
+                <div class="avatar-container bg-white p-6 rounded-[2.5rem] border border-slate-200 text-center transition-all">
+                    <div class="avatar-bg w-20 h-20 bg-slate-100 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl shadow-inner border-4 border-white">
+                        👩‍💻
+                    </div>
+                    <h4 class="font-extrabold text-slate-800 text-sm uppercase leading-tight">Integrante 2</h4>
+                    <p class="text-[9px] font-bold text-indigo-500 uppercase mt-1 tracking-widest">Analista de Datos</p>
+                </div>
+                <!-- Integrante 3 -->
+                <div class="avatar-container bg-white p-6 rounded-[2.5rem] border border-slate-200 text-center transition-all">
+                    <div class="avatar-bg w-20 h-20 bg-slate-100 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl shadow-inner border-4 border-white">
+                        👨‍🔧
+                    </div>
+                    <h4 class="font-extrabold text-slate-800 text-sm uppercase leading-tight">Integrante 3</h4>
+                    <p class="text-[9px] font-bold text-indigo-500 uppercase mt-1 tracking-widest">Desarrollador</p>
+                </div>
+                <!-- Integrante 4 -->
+                <div class="avatar-container bg-white p-6 rounded-[2.5rem] border border-slate-200 text-center transition-all">
+                    <div class="avatar-bg w-20 h-20 bg-slate-100 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl shadow-inner border-4 border-white">
+                        👩‍🎨
+                    </div>
+                    <h4 class="font-extrabold text-slate-800 text-sm uppercase leading-tight">Integrante 4</h4>
+                    <p class="text-[9px] font-bold text-indigo-500 uppercase mt-1 tracking-widest">Diseñador UI</p>
+                </div>
+            </div>
+
+            <!-- DERECHOS DE AUTOR -->
+            <div class="mt-12 bg-slate-50 border border-slate-200 rounded-3xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="bg-slate-900 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs">©</div>
+                    <div>
+                        <p class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Propiedad Intelectual</p>
+                        <p class="text-sm font-bold text-slate-700">Todos los derechos reservados. Grupo 03 - 2026</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-[9px] font-bold text-slate-400 uppercase italic">Este software está protegido por leyes internacionales de copyright y es de uso exclusivo académico para la UTMACH.</p>
+                </div>
+            </div>
+        </section>
     </main>
+   <!-- VISTA 2: DIAGRAMAS (CON FUNCIÓN DE DESCARGA) -->
+    <section id="view-diagrams" class="max-w-7xl mx-auto p-6 hidden">
+        <div class="text-center mb-10">
+            <h2 class="text-3xl font-black tracking-tighter uppercase italic">Repositorio Colaborativo</h2>
+            <p class="text-slate-500 text-xs font-bold uppercase tracking-widest mt-2">Haz clic en un diagrama para ampliarlo y descargarlo</p>
+        </div>
 
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Diagrama 1 -->
+            <div onclick="openModal('Algoritmo General', 'general.png')" class="diagram-card">
+                <div class="aspect-video bg-slate-50 rounded-2xl mb-4 overflow-hidden border border-slate-100 flex items-center justify-center relative">
+                    <img src="Diagrama_1.jpeg" class="w-full h-full object-cover z-10" onerror="this.nextElementSibling.style.display='flex'; this.style.display='none'">
+                    <div class="img-error-fallback hidden">general.png</div>
+                </div>
+                <h4 class="font-black text-xs uppercase text-center">Algoritmo General</h4>
+                <p class="text-[9px] text-center text-slate-400 mt-2 font-bold uppercase tracking-widest">Click para descargar</p>
+            </div>
+
+            <!-- Diagrama 2 -->
+            <div onclick="openModal('Función Suma', 'suma.png')" class="diagram-card">
+                <div class="aspect-video bg-slate-50 rounded-2xl mb-4 overflow-hidden border border-slate-100 flex items-center justify-center relative">
+                    <img src="Diagrma_2.jpeg" class="w-full h-full object-cover z-10" onerror="this.nextElementSibling.style.display='flex'; this.style.display='none'">
+                    <div class="img-error-fallback hidden">suma.png</div>
+                </div>
+                <h4 class="font-black text-xs uppercase text-center">Lógica de Suma</h4>
+                <p class="text-[9px] text-center text-slate-400 mt-2 font-bold uppercase tracking-widest">Click para descargar</p>
+            </div>
+
+            <!-- Diagrama 3 -->
+            <div onclick="openModal('Totales Categoría', 'categorias.png')" class="diagram-card">
+                <div class="aspect-video bg-slate-50 rounded-2xl mb-4 overflow-hidden border border-slate-100 flex items-center justify-center relative">
+                    <img src="Diagrma_3.jpeg" class="w-full h-full object-cover z-10" onerror="this.nextElementSibling.style.display='flex'; this.style.display='none'">
+                    <div class="img-error-fallback hidden">categorias.png</div>
+                </div>
+                <h4 class="font-black text-xs uppercase text-center">Recorrido Matriz</h4>
+                <p class="text-[9px] text-center text-slate-400 mt-2 font-bold uppercase tracking-widest">Click para descargar</p>
+            </div>
+
+            <!-- Diagrama 4 -->
+            <div onclick="openModal('Clasificación', 'clasificar.png')" class="diagram-card">
+                <div class="aspect-video bg-slate-50 rounded-2xl mb-4 overflow-hidden border border-slate-100 flex items-center justify-center relative">
+                    <img src="Diagrama_4.jpeg" class="w-full h-full object-cover z-10" onerror="this.nextElementSibling.style.display='flex'; this.style.display='none'">
+                    <div class="img-error-fallback hidden">clasificar.png</div>
+                </div>
+                <h4 class="font-black text-xs uppercase text-center">Estatus B</h4>
+                <p class="text-[9px] text-center text-slate-400 mt-2 font-bold uppercase tracking-widest">Click para descargar</p>
+            </div>
+        </div>
+    </section>
+
+  <!-- MODAL DE VISUALIZACIÓN Y DESCARGA -->
+    <div id="modal-viewer" class="fixed inset-0 z-[100] bg-slate-900/95 backdrop-blur-xl items-center justify-center p-6 hidden">
+        <div class="relative max-w-5xl w-full bg-white rounded-[3rem] p-10 shadow-2xl flex flex-col items-center">
+            <button onclick="closeModal()" class="absolute -top-4 -right-4 bg-rose-500 text-white w-12 h-12 rounded-full flex items-center justify-center font-bold hover:rotate-90 transition-transform shadow-xl">✕</button>
+            
+            <h3 id="modal-title" class="text-2xl font-black uppercase tracking-tighter mb-8 italic">Título del Diagrama</h3>
+            
+            <div class="w-full flex-1 bg-slate-50 rounded-[2rem] overflow-hidden flex items-center justify-center shadow-inner relative min-h-[400px] border-4 border-dashed border-slate-200">
+                <img id="modal-img" src="Diagrama_1.jpeg" class="max-w-full max-h-[50vh] object-contain shadow-2xl z-10 transition-all duration-500">
+                <div id="modal-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-slate-300">
+                    <svg class="w-20 h-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-width="1"/></svg>
+                </div>
+            </div>
+            
+            <div class="flex flex-col md:flex-row gap-4 mt-10 w-full md:w-auto">
+                <!-- BOTÓN DE DESCARGA PRINCIPAL -->
+                <a id="download-link" href="#" download class="bg-indigo-600 hover:bg-indigo-700 text-white px-12 py-5 rounded-2xl font-black text-sm uppercase tracking-widest transition-all shadow-xl shadow-indigo-200 flex items-center justify-center gap-4 group">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 group-hover:translate-y-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                    Descargar Diagrama
+                </a>
+                <button onclick="closeModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-500 px-12 py-5 rounded-2xl font-black text-sm uppercase tracking-widest transition-all">Regresar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- VISTA 3: AUDITORÍA -->
+    <section id="view-audit" class="max-w-7xl mx-auto p-6 hidden animate-in fade-in duration-500">
+        <div class="bg-white rounded-[2.5rem] shadow-xl border border-slate-200 overflow-hidden">
+            <div class="p-8 bg-slate-900 text-white flex justify-between items-end">
+                <div>
+                    <h2 class="text-3xl font-black italic tracking-tighter">LOG DE AUDITORÍA</h2>
+                    <p class="text-indigo-400 text-[10px] font-bold uppercase tracking-[0.2em] mt-2">Recomendaciones del informe técnico</p>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-100 border-b border-slate-200 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                            <th class="p-6">Día</th>
+                            <th class="p-6">Suma Día</th>
+                            <th class="p-6">Alerta</th>
+                            <th class="p-6">Acumulado</th>
+                            <th class="p-6 bg-indigo-50 text-indigo-700">Flag (Recomendaciones del Archivo)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="audit-log-body" class="text-sm font-semibold">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
     <script>
-        const categorias = ["Alimentación", "Transporte", "Materiales", "Entretenimiento", "Otros"];
-        const matrizGastos = [
-            [4.50, 1.20, 0.00, 2.50, 0.80], [3.90, 1.20, 1.50, 0.00, 0.60],
-            [5.10, 1.20, 0.00, 3.00, 0.00], [4.20, 1.20, 0.80, 0.00, 1.10],
-            [6.00, 1.20, 0.00, 4.50, 0.00], [4.80, 1.20, 1.00, 0.00, 0.50],
+        const cats = ["Alimentación", "Transporte", "Materiales", "Entretenimiento", "Otros"];
+        const matriz = [
+            [4.50, 1.20, 0.00, 2.50, 0.80],
+            [3.90, 1.20, 1.50, 0.00, 0.60],
+            [5.10, 1.20, 0.00, 3.00, 0.00],
+            [4.20, 1.20, 0.80, 0.00, 1.10],
+            [6.00, 1.20, 0.00, 4.50, 0.00],
+            [4.80, 1.20, 1.00, 0.00, 0.50],
             [5.50, 1.20, 0.00, 2.00, 0.90]
         ];
 
         let lineChart, barChart;
 
-        function changeAvatar(id) {
-            const img = document.getElementById(`avatar-${id}`);
-            const randomSeed = Math.random().toString(36).substring(7);
-            img.classList.add('avatar-loading');
-            setTimeout(() => {
-                img.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${randomSeed}`;
-                img.onload = () => img.classList.remove('avatar-loading');
-            }, 300);
-        }
-
         function initCharts() {
-            const commonOptions = {
-                responsive: true, maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: { 
-                    y: { grid: { color: '#f1f5f9' }, border: { display: false } },
-                    x: { grid: { display: false } }
-                }
-            };
-
-            lineChart = new Chart(document.getElementById('lineChart'), {
+            const ctxLine = document.getElementById('lineChart').getContext('2d');
+            lineChart = new Chart(ctxLine, {
                 type: 'line',
                 data: {
-                    labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
-                    datasets: [{
-                        label: 'Gasto Diario', borderColor: '#0052cc', backgroundColor: 'rgba(0, 82, 204, 0.1)',
-                        fill: true, tension: 0.4, pointRadius: 6, pointBackgroundColor: '#fff', pointBorderWidth: 3, data: []
-                    }, {
-                        label: 'Umbral', borderColor: '#ff5252', borderWidth: 2, borderDash: [6, 6], data: [], pointRadius: 0
-                    }]
+                    labels: ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7'],
+                    datasets: [{ label: 'Gasto Diario', borderColor: '#4f46e5', tension: 0.4, data: [] }]
                 },
-                options: commonOptions
+                options: { responsive: true, maintainAspectRatio: false }
             });
 
-            barChart = new Chart(document.getElementById('barChart'), {
+            const ctxBar = document.getElementById('barChart').getContext('2d');
+            barChart = new Chart(ctxBar, {
                 type: 'bar',
                 data: {
-                    labels: categorias,
-                    datasets: [{ backgroundColor: ['#0052cc', '#00b8d9', '#4c9aff', '#2684ff', '#091e42'], borderRadius: 15, data: [] }]
+                    labels: cats,
+                    datasets: [{ label: 'Total por Categoría', backgroundColor: '#8b5cf6', data: [] }]
                 },
-                options: commonOptions
+                options: { responsive: true, maintainAspectRatio: false }
             });
         }
 
-        function runAnalysis() {
+        function updateCalculations() {
             const B = parseFloat(document.getElementById('budgetInput').value) || 1;
-            const threshold = B * 0.20;
-            let dailyTotals = matrizGastos.map(dia => dia.reduce((a, b) => a + b, 0));
-            let categoryTotals = [0, 0, 0, 0, 0];
-            matrizGastos.forEach(dia => { dia.forEach((gasto, i) => categoryTotals[i] += gasto); });
-            const totalSemanal = dailyTotals.reduce((a, b) => a + b, 0);
+            const umbral = B * 0.20;
+            const categoryTotals = [0,0,0,0,0];
+            const dailyTotals = [];
+            const auditBody = document.getElementById('audit-log-body');
+            auditBody.innerHTML = '';
+            
+            let totalSemana = 0;
 
-            document.getElementById('weeklyTotal').innerText = `$${totalSemanal.toFixed(2)}`;
-            const perc = Math.min((totalSemanal / B) * 100, 100);
-            document.getElementById('progressBar').style.width = perc + '%';
-            document.getElementById('progressPercent').innerText = perc.toFixed(0) + '%';
+            matriz.forEach((dia, idx) => {
+                let daySum = dia.reduce((a, b) => a + b, 0);
+                dailyTotals.push(daySum);
+                dia.forEach((v, i) => categoryTotals[i] += v);
+                totalSemana += daySum;
 
-            const statusLabel = document.getElementById('statusLabel');
-            if (totalSemanal <= 0.90 * B) {
-                statusLabel.innerText = "ESTABLE";
-                statusLabel.className = "text-2xl font-black text-blue-600";
-            } else if (totalSemanal <= B) {
-                statusLabel.innerText = "RIESGO";
-                statusLabel.className = "text-2xl font-black text-amber-500";
+                // Recomendaciones basadas en el informe
+                let flag = "Mantener ritmo de ahorro.";
+                if (daySum > umbral) flag = "ALERTA: Reducir gastos mañana.";
+                if (daySum > 10) flag = "Crítico: Revisar hábitos urgentes.";
+
+                const row = document.createElement('tr');
+                row.className = "audit-log-row border-b border-slate-50";
+                row.innerHTML = `
+                    <td class="p-6 font-black text-slate-400 uppercase text-[10px]">Día ${idx+1}</td>
+                    <td class="p-6">$${daySum.toFixed(2)}</td>
+                    <td class="p-6"><span class="${daySum > umbral ? 'text-rose-600 font-black' : 'text-emerald-600'}">${daySum > umbral ? 'SÍ' : 'NO'}</span></td>
+                    <td class="p-6">$${totalSemana.toFixed(2)}</td>
+                    <td class="p-6 bg-indigo-50/50 text-indigo-700 font-bold italic">"${flag}"</td>
+                `;
+                auditBody.appendChild(row);
+            });
+
+            document.getElementById('weeklyTotal').innerText = `$${totalSemana.toFixed(2)}`;
+            const statusBox = document.getElementById('statusBox');
+            const statusText = document.getElementById('statusText');
+
+            if (totalSemana <= 0.9*B) {
+                statusText.innerText = "BAJO CONTROL";
+                statusBox.className = "p-6 rounded-3xl shadow-sm border bg-emerald-50 border-emerald-200 text-emerald-700";
+            } else if (totalSemana <= B) {
+                statusText.innerText = "EN ALERTA";
+                statusBox.className = "p-6 rounded-3xl shadow-sm border bg-amber-50 border-amber-200 text-amber-700";
             } else {
-                statusLabel.innerText = "CRÍTICO";
-                statusLabel.className = "text-2xl font-black text-red-500";
+                statusText.innerText = "EXCEDIDO";
+                statusBox.className = "p-6 rounded-3xl shadow-sm border bg-rose-50 border-rose-200 text-rose-700";
             }
 
+            const maxIndex = categoryTotals.indexOf(Math.max(...categoryTotals));
+            document.getElementById('domCat').innerText = cats[maxIndex].toUpperCase();
+
             lineChart.data.datasets[0].data = dailyTotals;
-            lineChart.data.datasets[1].data = Array(7).fill(threshold);
-            lineChart.update();
             barChart.data.datasets[0].data = categoryTotals;
+            lineChart.update();
             barChart.update();
+        }
 
-            document.getElementById('report-summary').innerHTML = `
-                <div class="flex justify-between border-b pb-2"><span class="text-slate-400">Presupuesto</span><span class="font-bold">$${B.toFixed(2)}</span></div>
-                <div class="flex justify-between border-b pb-2"><span class="text-slate-400">Total Gastado</span><span class="font-bold">$${totalSemanal.toFixed(2)}</span></div>
-            `;
+      // Función mejorada para descargar imágenes
+        function openModal(title, src) {
+            const modal = document.getElementById('modal-viewer');
+            const img = document.getElementById('modal-img');
+            const downloadLink = document.getElementById('download-link');
             
-            // Lógica de alertas diarias
-            const alertsDiv = document.getElementById('report-alerts');
-            alertsDiv.innerHTML = '';
-            dailyTotals.forEach((total, i) => {
-                if (total > threshold) {
-                    alertsDiv.innerHTML += `
-                        <div class="bg-red-50 text-red-600 p-2 rounded-lg text-[11px] font-bold border border-red-100">
-                            ⚠ DÍA ${i+1}: $${total.toFixed(2)} excede umbral ($${threshold.toFixed(2)})
-                        </div>
-                    `;
-                }
+            document.getElementById('modal-title').innerText = title;
+            img.src = src;
+            
+            // Configuramos el enlace de descarga
+            downloadLink.href = src;
+            downloadLink.download = `diagrama_G3_${src}`; // Sugiere un nombre de archivo al descargar
+            
+            modal.style.display = 'flex';
+            
+            // Efecto de entrada para la imagen
+            img.style.transform = 'scale(0.9)';
+            setTimeout(() => img.style.transform = 'scale(1)', 50);
+        }
+
+        function closeModal() { document.getElementById('modal-viewer').style.display = 'none'; }
+
+        function showView(viewId) {
+            ['dashboard', 'diagrams', 'audit'].forEach(id => {
+                document.getElementById('view-' + id).classList.toggle('hidden', id !== viewId);
+                document.getElementById('nav-' + id).classList.toggle('tab-active', id === viewId);
             });
-            if(alertsDiv.innerHTML === '') alertsDiv.innerHTML = '<p class="text-xs text-slate-400 italic">No hay alertas activas.</p>';
-
-            document.getElementById('report-conclusions').innerText = `Tras procesar la matriz de gastos, se recomienda optimizar la categoría ${categorias[categoryTotals.indexOf(Math.max(...categoryTotals))]} para mantener el ahorro proyectado.`;
         }
 
-        function showSection(id) {
-            document.getElementById('section-dashboard').classList.toggle('hidden', id !== 'dashboard');
-            document.getElementById('section-diagrams').classList.toggle('hidden', id !== 'diagrams');
-            document.getElementById('nav-dash').className = `btn-organic uppercase tracking-wider ${id === 'dashboard' ? 'tab-active' : 'text-slate-400'}`;
-            document.getElementById('nav-diag').className = `btn-organic uppercase tracking-wider ${id === 'diagrams' ? 'tab-active' : 'text-slate-400'}`;
-        }
-
-        window.onload = () => { initCharts(); runAnalysis(); };
+        window.onload = () => { initCharts(); updateCalculations(); };
     </script>
 </body>
 </html>
