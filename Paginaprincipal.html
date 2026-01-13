@@ -3,146 +3,309 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control de Gastos - Grupo 03</title>
+    <title>Analytics Finance - Grupo 03</title>
     
-    <!-- Scripts Externos -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f1f5f9; }
-        .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); }
-        .tab-active { @apply bg-slate-900 text-white shadow-xl scale-105; }
-        .chart-container { position: relative; height: 300px; width: 100%; }
-        .diagram-img { @apply max-w-full h-auto rounded-2xl shadow-2xl border-4 border-white object-contain; max-height: 60vh; }
+        :root {
+            --brand-blue: #0052cc;
+            --light-blue: #f0f7ff;
+            --dark-navy: #091e42;
+            --accent-cyan: #00b8d9;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f4f7fa;
+            color: var(--dark-navy);
+        }
+
+        /* Diseño Animalista/Orgánico: Formas de Guijarro */
+        .pebble-card {
+            background: white;
+            border-radius: 35px;
+            border: 1px solid rgba(0, 82, 204, 0.08);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.03);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+        }
+
+        .pebble-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 35px -10px rgba(0, 82, 204, 0.1);
+        }
+
+        .btn-organic {
+            border-radius: 20px;
+            padding: 8px 24px;
+            font-weight: 700;
+            font-size: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .tab-active {
+            background-color: var(--brand-blue);
+            color: white;
+            box-shadow: 0 8px 15px -4px rgba(0, 82, 204, 0.4);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 280px;
+            width: 100%;
+        }
+
+        /* Estilo de la Hoja de Auditoría */
+        .audit-paper {
+            border-radius: 40px;
+            background: linear-gradient(135deg, #ffffff 0%, #f9fbff 100%);
+            border: 2px solid #eef2f8;
+        }
+
+        .report-pill {
+            background: var(--light-blue);
+            border-left: 4px solid var(--brand-blue);
+            padding: 1rem;
+            border-radius: 12px 24px 24px 12px;
+        }
+
+        /* Animaciones */
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        input[type="number"] {
+            border-radius: 18px;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            padding: 12px 20px;
+            font-weight: 800;
+            color: var(--brand-blue);
+            outline: none;
+            width: 100%;
+        }
+
+        input[type="number"]:focus {
+            border-color: var(--brand-blue);
+            background: white;
+        }
+
+        .team-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 35px;
+            object-fit: cover;
+            background: var(--light-blue);
+            border: 4px solid white;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.05);
+        }
     </style>
 </head>
-<body class="antialiased text-slate-900">
+<body class="antialiased pb-20">
 
-    <!-- Navegación Superior -->
-    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
-                <div class="bg-indigo-600 p-2 rounded-xl text-white">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" /></svg>
-                </div>
-                <div>
-                    <h1 class="text-xl font-extrabold tracking-tight">Análisis Financiero Semanal</h1>
-                    <p class="text-[10px] font-bold text-indigo-600 uppercase tracking-widest">UTMACH - Ciencia de Datos & IA</p>
-                </div>
+    <!-- Header / Navbar -->
+    <header class="max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row justify-between items-center gap-6">
+        <div class="flex items-center gap-4">
+            <div class="w-14 h-14 bg-blue-600 rounded-[22px] flex items-center justify-center text-white shadow-xl shadow-blue-200 animate-float">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
             </div>
-            
-            <nav class="flex gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
-                <button onclick="showView('dashboard')" id="nav-dashboard" class="px-5 py-2 text-xs font-bold rounded-xl transition-all tab-active">DASHBOARD</button>
-                <button onclick="showView('diagrams')" id="nav-diagrams" class="px-5 py-2 text-xs font-bold rounded-xl transition-all text-slate-500 hover:text-indigo-600">DIAGRAMAS</button>
-            </nav>
+            <div>
+                <h1 class="text-2xl font-extrabold tracking-tight text-slate-900">Financial Insights</h1>
+                <p class="text-[10px] font-bold text-blue-500 uppercase tracking-[0.3em]">Data Science - Grupo 03</p>
+            </div>
         </div>
+
+        <nav class="flex gap-2 bg-white/80 backdrop-blur-md p-1.5 rounded-[25px] border border-slate-200 shadow-sm">
+            <button onclick="showSection('dashboard')" id="nav-dash" class="btn-organic tab-active uppercase tracking-wider">Dashboard</button>
+            <button onclick="showSection('diagrams')" id="nav-diag" class="btn-organic text-slate-400 hover:text-blue-600 uppercase tracking-wider">Diagramas</button>
+        </nav>
     </header>
 
-    <!-- VISTA 1: DASHBOARD INTERACTIVO -->
-    <main id="view-dashboard" class="max-w-7xl mx-auto p-6 space-y-8 animate-in fade-in duration-500">
-        
-        <!-- KPIs y Controles -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <!-- Entrada de Presupuesto -->
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col justify-center">
-                <label class="text-xs font-black text-slate-400 uppercase mb-2">Presupuesto Semanal (B)</label>
-                <div class="relative">
-                    <span class="absolute left-3 top-3 font-bold text-slate-400">$</span>
-                    <input type="number" id="budgetInput" value="60" oninput="updateCalculations()" class="w-full bg-slate-50 border-none rounded-2xl p-3 pl-8 text-2xl font-black focus:ring-2 focus:ring-indigo-500">
+    <main class="max-w-7xl mx-auto px-6 mt-6">
+
+        <!-- SECCIÓN DASHBOARD -->
+        <div id="section-dashboard" class="space-y-8">
+            
+            <!-- Grid de KPIs -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Input Presupuesto -->
+                <div class="pebble-card p-8 bg-slate-900 text-white border-none shadow-2xl">
+                    <span class="text-[10px] font-black text-blue-400 uppercase tracking-widest">Entrada de Datos</span>
+                    <h3 class="text-lg font-bold mt-2 mb-4">Presupuesto (B)</h3>
+                    <div class="relative">
+                        <span class="absolute left-4 top-3 text-slate-400 font-bold">$</span>
+                        <input type="number" id="budgetInput" value="60" oninput="runAnalysis()" class="pl-10 text-xl border-none ring-2 ring-slate-800 focus:ring-blue-500 bg-slate-800 text-white">
+                    </div>
                 </div>
-                <p class="text-[10px] text-slate-400 mt-2 italic">* Validado con bucle while en Python</p>
-            </div>
 
-            <!-- Gasto Total -->
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
-                <label class="text-xs font-black text-slate-400 uppercase">Gasto Total Semanal</label>
-                <div id="weeklyTotal" class="text-3xl font-black text-slate-900 mt-1">$0.00</div>
-                <div id="budgetProgress" class="w-full bg-slate-100 h-2 rounded-full mt-3 overflow-hidden">
-                    <div id="progressBar" class="bg-indigo-600 h-full transition-all duration-500" style="width: 0%"></div>
+                <!-- Total Gastado -->
+                <div class="pebble-card p-8 bg-blue-600 text-white border-none">
+                    <span class="text-[10px] font-bold text-blue-100 uppercase tracking-widest">Gasto Acumulado</span>
+                    <div id="weeklyTotal" class="text-5xl font-black mt-3">$0.00</div>
+                    <div class="mt-6 flex items-center justify-between">
+                        <span class="text-[10px] font-medium opacity-80">PROGRESO SEMANAL</span>
+                        <span id="progressPercent" class="text-xs font-black">0%</span>
+                    </div>
+                    <div class="mt-2 w-full bg-blue-800/40 h-2.5 rounded-full overflow-hidden">
+                        <div id="progressBar" class="bg-white h-full transition-all duration-1000" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Estado del Presupuesto -->
+                <div id="statusCard" class="pebble-card p-8 flex flex-col justify-center items-center text-center">
+                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Estado Financiero</span>
+                    <div id="statusLabel" class="text-2xl font-black text-slate-800">CARGANDO</div>
+                    <p id="statusSub" class="text-[10px] font-bold text-slate-400 uppercase mt-2">Analizando algoritmos...</p>
+                    <div class="mt-4 p-2 rounded-full bg-slate-50 w-full flex justify-center">
+                        <div id="statusIndicator" class="w-3 h-3 rounded-full bg-slate-300"></div>
+                    </div>
+                </div>
+
+                <!-- Categoría Crítica -->
+                <div class="pebble-card p-8 bg-white border-t-8 border-blue-600">
+                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Categoría Dominante</span>
+                    <div id="dominantCat" class="text-2xl font-black text-blue-700 mt-2">---</div>
+                    <div id="dominantVal" class="text-sm font-bold text-slate-500 mt-1">$0.00 USD</div>
+                    <div class="mt-6 text-[9px] bg-blue-50 text-blue-600 px-3 py-1 rounded-full font-black inline-block uppercase">Punto de atención</div>
                 </div>
             </div>
 
-            <!-- Estado Clasificado -->
-            <div id="statusBox" class="p-6 rounded-3xl shadow-sm border transition-all duration-500 flex flex-col justify-center">
-                <label class="text-xs font-black uppercase opacity-60">Estatus Financiero</label>
-                <div id="statusText" class="text-2xl font-black mt-1">Calculando...</div>
-                <p id="statusDesc" class="text-[10px] mt-1 font-bold"></p>
+            <!-- Gráficas Modernas -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="pebble-card p-10">
+                    <h4 class="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-8">Tendencia Diaria vs Límite</h4>
+                    <div class="chart-container">
+                        <canvas id="lineChart"></canvas>
+                    </div>
+                </div>
+                <div class="pebble-card p-10">
+                    <h4 class="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-8">Balance por Categoría</h4>
+                    <div class="chart-container">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
             </div>
 
-            <!-- Categoría Dominante -->
-            <div class="bg-slate-900 p-6 rounded-3xl shadow-xl text-white">
-                <label class="text-xs font-black text-indigo-400 uppercase">Categoría Dominante</label>
-                <div id="domCat" class="text-xl font-bold mt-1">---</div>
-                <div id="domAmount" class="text-xs font-medium text-slate-400">---</div>
+            <!-- INFORME DE AUDITORÍA -->
+            <div class="audit-paper p-10 shadow-xl">
+                <div class="flex items-center gap-4 mb-10 pb-6 border-b border-slate-100">
+                    <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-black text-slate-800">Hoja de Auditoría Automática</h2>
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Resultados del procesamiento de datos (Python Core)</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                    <div class="space-y-6">
+                        <h3 class="text-[11px] font-black text-blue-600 uppercase tracking-widest">1. Resumen de Flujo</h3>
+                        <div id="report-summary" class="space-y-4"></div>
+                    </div>
+                    <div class="space-y-6">
+                        <h3 class="text-[11px] font-black text-blue-600 uppercase tracking-widest">2. Alertas de Umbral</h3>
+                        <div id="report-alerts" class="space-y-2 max-h-[200px] overflow-y-auto pr-2"></div>
+                    </div>
+                    <div class="space-y-6">
+                        <h3 class="text-[11px] font-black text-blue-600 uppercase tracking-widest">3. Recomendación Técnica</h3>
+                        <div class="report-pill bg-blue-50/50">
+                            <p id="report-conclusions" class="text-sm text-slate-600 leading-relaxed italic"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN DE ORGANIZADORES (NUEVA) -->
+            <div class="mt-16 space-y-10">
+                <div class="text-center">
+                    <h2 class="text-2xl font-black text-slate-900">Equipo de Investigación</h2>
+                    <p class="text-[10px] font-bold text-blue-500 uppercase tracking-[0.4em] mt-2">Grupo 03 - Facultad de Ingeniería</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <!-- Integrante 1 -->
+                    <div class="pebble-card p-6 flex flex-col items-center text-center">
+                        <div class="relative mb-6">
+                            <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-400 rounded-[38px] blur opacity-20"></div>
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Integrante 1" class="team-avatar relative">
+                        </div>
+                        <h4 class="font-black text-slate-800 text-sm">Luis Alberto</h4>
+                        <span class="text-[9px] font-bold text-blue-600 uppercase mt-1">Líder de Proyecto</span>
+                        <p class="text-[11px] text-slate-400 mt-4 leading-relaxed">Especialista en estructuración de matrices y lógica de control presupuestario.</p>
+                    </div>
+
+                    <!-- Integrante 2 -->
+                    <div class="pebble-card p-6 flex flex-col items-center text-center">
+                        <div class="relative mb-6">
+                            <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-400 rounded-[38px] blur opacity-20"></div>
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka" alt="Integrante 2" class="team-avatar relative">
+                        </div>
+                        <h4 class="font-black text-slate-800 text-sm">María Fernanda</h4>
+                        <span class="text-[9px] font-bold text-blue-600 uppercase mt-1">Analista de Datos</span>
+                        <p class="text-[11px] text-slate-400 mt-4 leading-relaxed">Encargada del procesamiento estadístico y validación de umbrales críticos.</p>
+                    </div>
+
+                    <!-- Integrante 3 -->
+                    <div class="pebble-card p-6 flex flex-col items-center text-center">
+                        <div class="relative mb-6">
+                            <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-400 rounded-[38px] blur opacity-20"></div>
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Jack" alt="Integrante 3" class="team-avatar relative">
+                        </div>
+                        <h4 class="font-black text-slate-800 text-sm">Carlos Javier</h4>
+                        <span class="text-[9px] font-bold text-blue-600 uppercase mt-1">Desarrollador Python</span>
+                        <p class="text-[11px] text-slate-400 mt-4 leading-relaxed">Responsable de la automatización de cálculos y bucles de control.</p>
+                    </div>
+
+                    <!-- Integrante 4 -->
+                    <div class="pebble-card p-6 flex flex-col items-center text-center">
+                        <div class="relative mb-6">
+                            <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-400 rounded-[38px] blur opacity-20"></div>
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Kimberly" alt="Integrante 4" class="team-avatar relative">
+                        </div>
+                        <h4 class="font-black text-slate-800 text-sm">Elena Sofía</h4>
+                        <span class="text-[9px] font-bold text-blue-600 uppercase mt-1">Diseñadora de UI</span>
+                        <p class="text-[11px] text-slate-400 mt-4 leading-relaxed">Enfocada en la visualización de resultados y experiencia de usuario financiera.</p>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Gráficas Principales -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- Gráfico de Líneas (Puntos) -->
-            <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-200">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="font-black text-slate-800 uppercase tracking-tight">Gasto Total Diario</h3>
-                    <span class="text-[10px] bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full font-black">Línea Alerta: 0.20B</span>
+        <!-- SECCIÓN DIAGRAMAS -->
+        <div id="section-diagrams" class="hidden space-y-8">
+            <div class="pebble-card p-10 flex flex-col items-center">
+                <div class="flex flex-wrap justify-center gap-3 mb-10 bg-slate-100 p-2 rounded-[30px]">
+                    <button onclick="changeDiag('general')" class="diag-btn btn-organic tab-active">GENERAL</button>
+                    <button onclick="changeDiag('suma')" class="diag-btn btn-organic text-slate-500">SUMA_LISTA</button>
+                    <button onclick="changeDiag('cat')" class="diag-btn btn-organic text-slate-500">CATEGORÍAS</button>
+                    <button onclick="changeDiag('clasifica')" class="diag-btn btn-organic text-slate-500">CLASIFICACIÓN</button>
                 </div>
-                <div class="chart-container">
-                    <canvas id="lineChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Gráfico de Barras -->
-            <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-200">
-                <h3 class="font-black text-slate-800 uppercase tracking-tight mb-6">Gasto por Categoría</h3>
-                <div class="chart-container">
-                    <canvas id="barChart"></canvas>
+                <div class="w-full max-w-4xl">
+                    <img id="mainDiagImg" src="https://via.placeholder.com/1000x600/f8fafc/0052cc?text=DIAGRAMA+GENERAL+PSeInt" class="w-full h-auto rounded-[40px] shadow-2xl border-[12px] border-white">
                 </div>
             </div>
         </div>
 
-        <!-- Reporte Textual -->
-        <div class="bg-slate-50 border border-slate-200 rounded-[2.5rem] p-8">
-            <h3 class="font-black text-slate-800 uppercase text-sm mb-4">Reporte de Sistema (generar_reporte)</h3>
-            <div id="reportArea" class="font-mono text-sm text-slate-600 whitespace-pre-wrap leading-relaxed"></div>
-        </div>
     </main>
 
-    <!-- VISTA 2: GALERÍA DE DIAGRAMAS -->
-    <section id="view-diagrams" class="max-w-7xl mx-auto p-6 hidden animate-in slide-in-from-bottom-4 duration-500">
-        <div class="bg-white p-8 rounded-[3rem] shadow-2xl border border-slate-200 flex flex-col items-center">
-            
-            <div class="text-center mb-8">
-                <h2 id="diag-title" class="text-3xl font-black text-slate-900 tracking-tighter">Diagramas de Flujo del Algoritmo</h2>
-                <div class="flex flex-wrap justify-center gap-2 mt-6 p-2 bg-slate-100 rounded-2xl">
-                    <button onclick="updateDiagram('general')" class="diag-btn px-4 py-2 text-[10px] font-black rounded-xl transition-all tab-active">GENERAL</button>
-                    <button onclick="updateDiagram('suma')" class="diag-btn px-4 py-2 text-[10px] font-black rounded-xl transition-all text-slate-500">SUMA LISTA</button>
-                    <button onclick="updateDiagram('cat')" class="diag-btn px-4 py-2 text-[10px] font-black rounded-xl transition-all text-slate-500">TOTALES CATEGORÍA</button>
-                    <button onclick="updateDiagram('clasificar')" class="diag-btn px-4 py-2 text-[10px] font-black rounded-xl transition-all text-slate-500">CLASIFICACIÓN</button>
-                    <button onclick="updateDiagram('reporte')" class="diag-btn px-4 py-2 text-[10px] font-black rounded-xl transition-all text-slate-500">REPORTE</button>
-                </div>
-            </div>
-
-            <!-- ESPACIO PARA TUS IMÁGENES -->
-            <div class="relative group">
-                <img id="diag-img" src="https://via.placeholder.com/1200x800/f1f5f9/475569?text=PONER+IMAGEN+DEL+DIAGRAMA+AQUÍ" alt="Diagrama" class="diagram-img">
-                <div class="absolute bottom-4 right-4 bg-slate-900/80 text-white text-[10px] px-4 py-2 rounded-full backdrop-blur-md">
-                    Diagrama Técnico Oficial - Grupo 03
-                </div>
-            </div>
-            
-            <p id="diag-desc" class="mt-8 text-slate-500 text-sm max-w-2xl text-center font-medium italic">
-                Carga tus capturas de PSeInt para visualizar la lógica del sistema.
-            </p>
-        </div>
-    </section>
-
-    <footer class="py-12 text-center text-slate-400 font-bold text-[10px] tracking-widest uppercase">
-        Fundamentos de Programación • Enero 2026 • Machala, Ecuador
+    <footer class="mt-20 py-10 text-center border-t border-slate-200">
+        <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.5em]">UTMACH 2026 - Universidad Técnica de Machala</p>
     </footer>
 
     <script>
-        // DATOS BASE (Matriz 7x5 del PDF)
         const categorias = ["Alimentación", "Transporte", "Materiales", "Entretenimiento", "Otros"];
         const matrizGastos = [
             [4.50, 1.20, 0.00, 2.50, 0.80],
@@ -157,139 +320,133 @@
         let lineChart, barChart;
 
         function initCharts() {
-            const ctxLine = document.getElementById('lineChart').getContext('2d');
-            lineChart = new Chart(ctxLine, {
+            const commonOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { 
+                    y: { grid: { color: '#f1f5f9' }, border: { display: false } },
+                    x: { grid: { display: false } }
+                }
+            };
+
+            lineChart = new Chart(document.getElementById('lineChart'), {
                 type: 'line',
                 data: {
-                    labels: ['Día 1', 'Día 2', 'Día 3', 'Día 4', 'Día 5', 'Día 6', 'Día 7'],
+                    labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
                     datasets: [{
-                        label: 'Gasto Diario ($)',
-                        borderColor: '#4f46e5',
-                        backgroundColor: '#4f46e5',
-                        data: [],
+                        label: 'Gasto Diario',
+                        borderColor: '#0052cc',
+                        backgroundColor: 'rgba(0, 82, 204, 0.1)',
+                        fill: true,
                         tension: 0.4,
                         pointRadius: 6,
-                        pointHoverRadius: 10
+                        pointBackgroundColor: '#fff',
+                        pointBorderWidth: 3,
+                        data: []
                     }, {
-                        label: 'Umbral Alerta',
-                        borderColor: '#ef4444',
+                        label: 'Umbral',
+                        borderColor: '#ff5252',
                         borderWidth: 2,
-                        borderDash: [5, 5],
+                        borderDash: [6, 6],
                         data: [],
                         pointRadius: 0
                     }]
                 },
-                options: { responsive: true, maintainAspectRatio: false }
+                options: commonOptions
             });
 
-            const ctxBar = document.getElementById('barChart').getContext('2d');
-            barChart = new Chart(ctxBar, {
+            barChart = new Chart(document.getElementById('barChart'), {
                 type: 'bar',
                 data: {
                     labels: categorias,
                     datasets: [{
-                        label: 'Total Acumulado ($)',
-                        backgroundColor: ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981'],
+                        backgroundColor: ['#0052cc', '#00b8d9', '#4c9aff', '#2684ff', '#091e42'],
+                        borderRadius: 15,
                         data: []
                     }]
                 },
-                options: { responsive: true, maintainAspectRatio: false }
+                options: commonOptions
             });
         }
 
-        function updateCalculations() {
+        function runAnalysis() {
             const B = parseFloat(document.getElementById('budgetInput').value) || 1;
-            const umbralAlerta = B * 0.20;
-            const dailyTotals = matrizGastos.map(dia => dia.reduce((a, b) => a + b, 0));
-            const categoryTotals = [0, 0, 0, 0, 0];
-            
+            const threshold = B * 0.20;
+
+            let dailyTotals = matrizGastos.map(dia => dia.reduce((a, b) => a + b, 0));
+            let categoryTotals = [0, 0, 0, 0, 0];
             matrizGastos.forEach(dia => {
                 dia.forEach((gasto, i) => categoryTotals[i] += gasto);
             });
 
             const totalSemanal = dailyTotals.reduce((a, b) => a + b, 0);
-            
-            // UI Update: Totales
-            document.getElementById('weeklyTotal').innerText = `$${totalSemanal.toFixed(2)}`;
-            const progress = Math.min((totalSemanal / B) * 100, 100);
-            document.getElementById('progressBar').style.width = progress + '%';
 
-            // Clasificación (Lógica if/elif/else)
-            const statusBox = document.getElementById('statusBox');
-            const statusText = document.getElementById('statusText');
-            const statusDesc = document.getElementById('statusDesc');
+            document.getElementById('weeklyTotal').innerText = `$${totalSemanal.toFixed(2)}`;
+            const perc = Math.min((totalSemanal / B) * 100, 100);
+            document.getElementById('progressBar').style.width = perc + '%';
+            document.getElementById('progressPercent').innerText = perc.toFixed(0) + '%';
+
+            const statusLabel = document.getElementById('statusLabel');
+            const statusSub = document.getElementById('statusSub');
+            const indicator = document.getElementById('statusIndicator');
 
             if (totalSemanal <= 0.90 * B) {
-                statusText.innerText = "BAJO CONTROL";
-                statusDesc.innerText = "Excelente gestión financiera.";
-                statusBox.className = "p-6 rounded-3xl shadow-sm border bg-emerald-50 border-emerald-200 text-emerald-700";
+                statusLabel.innerText = "ESTABLE";
+                statusLabel.className = "text-2xl font-black text-blue-600";
+                statusSub.innerText = "Dentro de los parámetros";
+                indicator.className = "w-3 h-3 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]";
             } else if (totalSemanal <= B) {
-                statusText.innerText = "EN ALERTA";
-                statusDesc.innerText = "Gasto superior al 90%. Precaución.";
-                statusBox.className = "p-6 rounded-3xl shadow-sm border bg-amber-50 border-amber-200 text-amber-700";
+                statusLabel.innerText = "RIESGO";
+                statusLabel.className = "text-2xl font-black text-amber-500";
+                statusSub.innerText = "Cerca del agotamiento";
+                indicator.className = "w-3 h-3 rounded-full bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)]";
             } else {
-                statusText.innerText = "EXCEDIDO";
-                statusDesc.innerText = "Presupuesto superado. Revisar gastos.";
-                statusBox.className = "p-6 rounded-3xl shadow-sm border bg-rose-50 border-rose-200 text-rose-700";
+                statusLabel.innerText = "CRÍTICO";
+                statusLabel.className = "text-2xl font-black text-red-500";
+                statusSub.innerText = "Sobregiro detectado";
+                indicator.className = "w-3 h-3 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]";
             }
 
-            // Categoría Dominante
             const maxIdx = categoryTotals.indexOf(Math.max(...categoryTotals));
-            document.getElementById('domCat').innerText = categorias[maxIdx].toUpperCase();
-            document.getElementById('domAmount').innerText = `$${categoryTotals[maxIdx].toFixed(2)} Acumulado`;
+            document.getElementById('dominantCat').innerText = categorias[maxIdx].toUpperCase();
+            document.getElementById('dominantVal').innerText = `$${categoryTotals[maxIdx].toFixed(2)} Acumulado`;
 
-            // Update Charts
             lineChart.data.datasets[0].data = dailyTotals;
-            lineChart.data.datasets[1].data = Array(7).fill(umbralAlerta);
+            lineChart.data.datasets[1].data = Array(7).fill(threshold);
             lineChart.update();
-
             barChart.data.datasets[0].data = categoryTotals;
             barChart.update();
 
-            // Generar Reporte
-            let reporte = `>>> REPORTE GENERADO AUTOMÁTICAMENTE <<<\n`;
-            reporte += `Presupuesto Base (B): $${B.toFixed(2)}\n`;
-            reporte += `Gasto Total: $${totalSemanal.toFixed(2)}\n`;
-            reporte += `----------------------------------------\n`;
-            dailyTotals.forEach((t, i) => {
-                const alerta = t > umbralAlerta ? " [!!! ALERTA]" : "";
-                reporte += `Día ${i+1}: $${t.toFixed(2)}${alerta}\n`;
-            });
-            document.getElementById('reportArea').innerText = reporte;
+            document.getElementById('report-summary').innerHTML = `
+                <div class="flex justify-between border-b pb-2"><span class="text-slate-400">Techo Semanal</span><span class="font-bold">$${B.toFixed(2)}</span></div>
+                <div class="flex justify-between border-b pb-2"><span class="text-slate-400">Total Consumido</span><span class="font-bold">$${totalSemanal.toFixed(2)}</span></div>
+                <div class="flex justify-between"><span class="text-slate-400">Disponibilidad</span><span class="font-bold text-blue-600">$${Math.max(0, B - totalSemanal).toFixed(2)}</span></div>
+            `;
+
+            let alerts = dailyTotals.map((t, i) => t > threshold ? `Día ${i+1}: $${t.toFixed(2)}` : null).filter(x => x);
+            document.getElementById('report-alerts').innerHTML = alerts.length > 0 
+                ? alerts.map(a => `<div class="p-2 bg-red-50 text-red-600 rounded-lg text-[10px] font-bold border border-red-100 flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-red-600"></div> ${a} EXCESO</div>`).join('')
+                : `<p class="text-[10px] text-slate-300">No se detectaron excesos diarios.</p>`;
+
+            document.getElementById('report-conclusions').innerText = `El algoritmo identifica que la categoría de ${categorias[maxIdx]} es la responsable del ${(categoryTotals[maxIdx]/totalSemanal*100).toFixed(1)}% del gasto total. Se sugiere un ajuste de consumo inmediato para evitar el estado crítico.`;
         }
 
-        function showView(viewId) {
-            document.getElementById('view-dashboard').classList.toggle('hidden', viewId !== 'dashboard');
-            document.getElementById('view-diagrams').classList.toggle('hidden', viewId !== 'diagrams');
-            document.getElementById('nav-dashboard').className = viewId === 'dashboard' ? 'px-5 py-2 text-xs font-bold rounded-xl transition-all tab-active' : 'px-5 py-2 text-xs font-bold rounded-xl transition-all text-slate-500 hover:text-indigo-600';
-            document.getElementById('nav-diagrams').className = viewId === 'diagrams' ? 'px-5 py-2 text-xs font-bold rounded-xl transition-all tab-active' : 'px-5 py-2 text-xs font-bold rounded-xl transition-all text-slate-500 hover:text-indigo-600';
+        function showSection(id) {
+            document.getElementById('section-dashboard').classList.toggle('hidden', id !== 'dashboard');
+            document.getElementById('section-diagrams').classList.toggle('hidden', id !== 'diagrams');
+            document.getElementById('nav-dash').className = `btn-organic uppercase tracking-wider ${id === 'dashboard' ? 'tab-active' : 'text-slate-400 hover:text-blue-600'}`;
+            document.getElementById('nav-diag').className = `btn-organic uppercase tracking-wider ${id === 'diagrams' ? 'tab-active' : 'text-slate-400 hover:text-blue-600'}`;
         }
 
-        const diagInfo = {
-            'general': { title: 'Algoritmo General', desc: 'Validación del presupuesto, bucles de procesamiento (break/continue) y salida.', img: 'general.png' },
-            'suma': { title: 'Función: suma_lista', desc: 'Suma de elementos en estructuras unidimensionales.', img: 'suma.png' },
-            'cat': { title: 'Función: totales_categoria', desc: 'Cálculo de acumulados por columnas (5 categorías).', img: 'cat.png' },
-            'clasificar': { title: 'Función: clasificar_presupuesto', desc: 'Lógica condicional para estados financieros.', img: 'clasificar.png' },
-            'reporte': { title: 'Función: generar_reporte', desc: 'Módulo de concatenación de texto para el reporte final.', img: 'reporte.png' }
-        };
-
-        function updateDiagram(type) {
-            const data = diagInfo[type];
-            document.getElementById('diag-title').innerText = data.title;
-            document.getElementById('diag-desc').innerText = data.desc;
-            document.getElementById('diag-img').src = `https://via.placeholder.com/1200x800/f1f5f9/475569?text=${data.title}`;
-            
-            document.querySelectorAll('.diag-btn').forEach(btn => {
-                btn.classList.remove('tab-active');
-                btn.classList.add('text-slate-500');
-            });
+        function changeDiag(type) {
+            const diags = { 'general': 'GENERAL', 'suma': 'SUMA_LISTA', 'cat': 'CATEGORÍAS', 'clasifica': 'CLASIFICACIÓN' };
+            document.getElementById('mainDiagImg').src = `https://via.placeholder.com/1000x600/f8fafc/0052cc?text=DIAGRAMA+${diags[type]}`;
+            document.querySelectorAll('.diag-btn').forEach(btn => btn.classList.remove('tab-active'));
             event.target.classList.add('tab-active');
         }
 
-        window.onload = () => {
-            initCharts();
-            updateCalculations();
-        };
+        window.onload = () => { initCharts(); runAnalysis(); };
     </script>
 </body>
 </html>
